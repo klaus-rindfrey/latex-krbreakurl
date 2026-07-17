@@ -1,0 +1,26 @@
+build/
+
+*.aux
+*.lof
+*.log
+*.lot
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+
+
+## Editors:
+# Emacs
+*~
+\#*\#
+.\#*
+
+# WinEdt
+*.bak
+*.sav

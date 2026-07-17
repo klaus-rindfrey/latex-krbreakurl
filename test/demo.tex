@@ -1,0 +1,55 @@
+\documentclass[a5paper,11pt]{article}
+
+\usepackage{fontspec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{krbreakurl}
+
+% A deliberately narrow text block makes the line-breaking behavior easy
+% to inspect.
+\setlength{\textwidth}{7cm}
+
+\begin{document}
+
+\section*{Default continuation mark}
+
+This paragraph provides enough surrounding text to demonstrate how a long URL
+behaves inside normal prose. The following address is deliberately much longer
+than the available line width:
+
+\medskip
+
+\breakurl{https://www.example.org/documentation/releases/2026/07/16/a/very/long/path/with/query/parameters?language=en&format=pdf&download=true#installation-instructions}
+
+\bigskip
+
+\section*{Other URI schemes}
+
+The package also protects schemes other than HTTP and HTTPS:
+
+\medskip
+
+\breakurl{ftp://ftp.example.org/pub/releases/2026/07/16/packages/krbreakurl/abcdefghijklmnopqrstuvwxyz0123456789.tar.gz}
+
+\bigskip
+
+\breakurl{mailto:someone.with.a.very.long.name+latex-package@example.org?subject=Question-about-krbreakurl&body=This-is-a-long-test-message}
+
+\bigskip
+
+\breakurl{doi:10.1000/abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ}
+
+\bigskip
+
+\section*{Configured continuation mark}
+
+The continuation mark can be changed without modifying the package:
+
+\krbreakurlsetup{
+  continuation={\tiny$\Rightarrow$}
+}
+
+\medskip
+
+\breakurl{git+ssh://git.example.org/repositories/latex/krbreakurl/branches/feature/configurable-continuation-symbol/documentation/index.html}
+
+\end{document}

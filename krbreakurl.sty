@@ -1,0 +1,142 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesExplPackage
+  {krbreakurl}
+  {2026-07-16}
+  {0.03}
+  {Breakable URLs with visible continuation marks}
+
+\RequirePackage{hyperref}
+
+\ExplSyntaxOn
+
+\tl_new:N  \l_krbreakurl_url_tl
+\tl_new:N  \l_krbreakurl_continuation_tl
+\seq_new:N \l_krbreakurl_scheme_match_seq
+
+\int_new:N \l_krbreakurl_url_len_int
+\int_new:N \l_krbreakurl_scheme_len_int
+\int_new:N \l_krbreakurl_position_int
+
+\keys_define:nn
+  { krbreakurl }
+  {
+    continuation .tl_set:N =
+      \l_krbreakurl_continuation_tl,
+
+    continuation .initial:n =
+      {
+        \tiny
+        $\hookrightarrow$
+      }
+  }
+
+\cs_new_protected:Npn \krbreakurl_set_scheme_length:n #1
+  {
+    \int_zero:N \l_krbreakurl_scheme_len_int
+    \seq_clear:N \l_krbreakurl_scheme_match_seq
+
+    \regex_extract_once:nnNT
+      { \A [A-Za-z] [A-Za-z0-9+.-]* : (//)? }
+      { #1 }
+      \l_krbreakurl_scheme_match_seq
+      {
+        \int_set:Nn
+          \l_krbreakurl_scheme_len_int
+          {
+            \tl_count:e
+              {
+                \seq_item:Nn
+                  \l_krbreakurl_scheme_match_seq
+                  { 1 }
+              }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \krbreakurl_insert_breakpoint:
+  {
+    \nobreak
+    \hskip 0pt plus .5pt
+
+    \discretionary
+      {
+        \hbox to 0pt
+          {
+            \tl_use:N \l_krbreakurl_continuation_tl
+            \hss
+          }
+      }
+      { }
+      { }
+  }
+
+\cs_new_protected:Npn \krbreakurl_typeset:n #1
+  {
+    \group_begin:
+      \ttfamily
+
+      \tl_set:Nn \l_krbreakurl_url_tl { #1 }
+
+      \int_set:Nn
+        \l_krbreakurl_url_len_int
+        { \tl_count:N \l_krbreakurl_url_tl }
+
+      \krbreakurl_set_scheme_length:n { #1 }
+
+      \href{#1}
+        {
+          \int_zero:N \l_krbreakurl_position_int
+
+          \tl_map_inline:Nn
+            \l_krbreakurl_url_tl
+            {
+              \int_incr:N \l_krbreakurl_position_int
+
+              ##1
+
+              \int_compare:nNnT
+                { \l_krbreakurl_position_int }
+                >
+                { 1 }
+                {
+                  \int_compare:nT
+                    {
+                      \l_krbreakurl_position_int
+                      >=
+                      \l_krbreakurl_scheme_len_int
+                    }
+                    {
+                      \int_compare:nNnT
+                        { \l_krbreakurl_position_int }
+                        <
+                        { \l_krbreakurl_url_len_int - 1 }
+                        {
+                          \krbreakurl_insert_breakpoint:
+                        }
+                    }
+                }
+            }
+        }
+
+    \group_end:
+  }
+
+\NewDocumentCommand
+  \krbreakurlsetup
+  { m }
+  {
+    \keys_set:nn
+      { krbreakurl }
+      { #1 }
+  }
+
+\NewDocumentCommand
+  \breakurl
+  { v }
+  {
+    \krbreakurl_typeset:n { #1 }
+  }
+
+\ExplSyntaxOff
+
+\endinput
