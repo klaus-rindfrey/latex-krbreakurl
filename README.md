@@ -1,68 +1,55 @@
 # krbreakurl
 
-> **Improved line breaking for long URLs and URIs in LuaLaTeX**
+> Improved line breaking for long URLs and URIs in LuaLaTeX
 
-`krbreakurl` is a lightweight LuaLaTeX package that improves the
-typesetting of long URLs and URIs. It allows line breaks after almost
-every character while keeping URI schemes such as `https://`, `mailto:`
-and `git+ssh://` intact. Optionally, a visible continuation mark can be
-printed whenever a URL continues on the next line.
+`krbreakurl` is a lightweight LuaLaTeX package that improves the typesetting of
+long URLs and URIs. It allows line breaks after almost every character while
+keeping URI schemes such as `https://`, `mailto:` and `git+ssh://` intact.
+Optionally, a visible continuation mark can be printed whenever a URL continues
+on the next line.
 
-------------------------------------------------------------------------
+## Why another URL package?
 
-# Why another URL package?
+LaTeX already offers `\url` through `url` and `hyperref`, and the excellent
+`xurl` package extends the available break points considerably.
 
-LaTeX already offers `\url` through `url` and `hyperref`, and the
-excellent `xurl` package extends the available break points
-considerably.
+`krbreakurl` was created with a different objective. Instead of optimizing the
+list of legal break characters, it inserts a possible break after almost every
+character. This gives TeX much more freedom when setting narrow columns or
+documents containing exceptionally long URLs.
 
-`krbreakurl` was created with a different objective.
+The package also offers an optional continuation mark, making wrapped URLs
+easier to read.
 
-Instead of optimizing the list of legal break characters, it inserts a
-possible break after almost every character. This gives TeX much more
-freedom when setting narrow columns or documents containing
-exceptionally long URLs.
+## Features
 
-The package also offers an optional continuation mark, making wrapped
-URLs easier to read.
+- line breaks after almost every character
+- URI schemes remain intact
+- hyperlinks remain clickable
+- configurable continuation mark
+- ordinary text hyphenation remains unchanged
+- compact implementation based on `expl3`
+- designed for LuaLaTeX
 
-------------------------------------------------------------------------
+## Requirements
 
-# Features
+- LuaLaTeX
+- `hyperref`
 
--   line breaks after almost every character
--   URI schemes remain intact
--   hyperlinks remain clickable
--   configurable continuation mark
--   does not affect ordinary text hyphenation
--   compact implementation based on `expl3`
--   designed for LuaLaTeX
+## Installation
 
-------------------------------------------------------------------------
+Place `krbreakurl.sty` in the same directory as your document, or install it in a
+directory searched by TeX.
 
-# Requirements
+Load the package with:
 
--   LuaLaTeX
--   `hyperref`
-
-------------------------------------------------------------------------
-
-# Installation
-
-Copy `krbreakurl.sty` into your project directory or any directory
-searched by TeX.
-
-Load the package:
-
-``` latex
+```latex
 \usepackage{krbreakurl}
 ```
 
-------------------------------------------------------------------------
+## Basic usage
 
-# Basic usage
-
-``` latex
+```latex
 Please visit
 
 \breakurl{https://www.example.org/a/very/long/path/that/will/eventually/wrap}
@@ -70,121 +57,102 @@ Please visit
 for further information.
 ```
 
-------------------------------------------------------------------------
+## Configuration
 
-# Configuration
+Change the continuation mark globally:
 
-The continuation mark can be changed globally.
-
-``` latex
+```latex
 \krbreakurlsetup{
   continuation={\tiny$\Rightarrow$}
 }
 ```
 
-To suppress it completely:
+Suppress it completely:
 
-``` latex
+```latex
 \krbreakurlsetup{
   continuation={}
 }
 ```
 
-------------------------------------------------------------------------
+The default is:
 
-# Supported URI schemes
+```latex
+\tiny$\hookrightarrow$
+```
 
-URI schemes are recognized according to RFC 3986.
+## Supported URI schemes
 
-Typical examples include
+URI schemes are recognized according to RFC 3986. Typical examples include:
 
--   `https://`
--   `http://`
--   `ftp://`
--   `file://`
--   `git+ssh://`
--   `mailto:`
--   `doi:`
+- `https://`
+- `http://`
+- `ftp://`
+- `file://`
+- `git+ssh://`
+- `mailto:`
+- `doi:`
 
-------------------------------------------------------------------------
+The scheme and an immediately following `//` are kept together.
 
-# Design goals
+## Comparison
 
-The package has deliberately modest goals:
+| Package | Breaks after nearly every character | Protects URI scheme | Continuation mark |
+|---|:---:|:---:|:---:|
+| `url` | No | Yes | No |
+| `xurl` | Mostly | Yes | No |
+| `krbreakurl` | Yes | Yes | Yes |
 
--   produce aesthetically pleasing URL line breaks
--   preserve URI prefixes
--   preserve hyperlinks
--   keep the implementation small
--   remain easy to understand and maintain
+## Implementation notes
 
-------------------------------------------------------------------------
+Internally, the package:
 
-# Implementation notes
+- is written in `expl3`,
+- creates hyperlinks with `\href`,
+- inserts break opportunities with `\discretionary`,
+- detects URI schemes using an RFC-3986-style regular expression,
+- prevents a break at the stretchable glue preceding each discretionary.
 
-Internally the package
+## Limitations
 
--   is written in `expl3`,
--   wraps hyperlinks using `\href`,
--   inserts break opportunities with `\discretionary`,
--   protects URI schemes before inserting break points.
+- intended for LuaLaTeX
+- intended for URLs and URIs
+- not intended as a drop-in replacement for `xurl`
+- currently provides one configuration option only
 
-------------------------------------------------------------------------
+## Building the documentation
 
-# Comparison
+Generate `krbreakurl.pdf` from `krbreakurl.dtx` with:
 
-  --------------------------------------------------------------------------------
-  Package          Nearly arbitrary breaks  Protect URI scheme  Continuation mark
-  ---------------- ------------------------ ------------------- ------------------
-  `url`                       No                    Yes                 No
+```bash
+latexmk -lualatex krbreakurl.dtx
+```
 
-  `xurl`                    Mostly                  Yes                 No
+The current repository keeps `krbreakurl.sty` alongside the documented
+source. For a clean documentation rebuild:
 
-  **krbreakurl**             Yes                    Yes                Yes
-  --------------------------------------------------------------------------------
+```bash
+latexmk -C krbreakurl.dtx
+latexmk -lualatex krbreakurl.dtx
+```
 
-------------------------------------------------------------------------
-
-# Limitations
-
--   intended for LuaLaTeX
--   intended for URLs and URIs
--   not a replacement for `xurl`
--   currently focuses on practical URL typesetting rather than extensive
-    package options
-
-------------------------------------------------------------------------
-
-# License
+## License
 
 MIT License.
 
-------------------------------------------------------------------------
+## History
 
-# History
-
-## Version 0.01
+### Version 0.01
 
 Initial implementation.
 
-## Version 0.02
+### Version 0.02
 
-Internal refactoring.
+Internal improvements.
 
-## Version 0.03
+### Version 0.03
 
--   generalized URI scheme detection
--   configurable continuation mark
--   improved internal structure
-
-------------------------------------------------------------------------
-
-# Future work
-
-Possible future enhancements include
-
--   additional configuration options
--   optional package options
--   CTAN distribution
--   documented test suite
--   `.dtx` source distribution
+- generalized URI scheme detection
+- added `\krbreakurlsetup`
+- made the continuation mark configurable
+- improved internal structure

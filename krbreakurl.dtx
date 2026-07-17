@@ -1,0 +1,240 @@
+% \iffalse meta-comment
+%
+% Copyright (c) 2026 Klaus Rindfrey
+%
+% This file may be distributed and/or modified under the conditions of the
+% MIT License.
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{fontspec}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{krbreakurl.dtx}
+\end{document}
+%</driver>
+%
+% \fi
+%
+% \GetFileInfo{krbreakurl.sty}
+%
+% \title{\textsf{krbreakurl}: breakable URLs with visible continuation marks}
+% \author{Klaus Rindfrey}
+% \date{Version \fileversion\ (\filedate)}
+%
+% \maketitle
+%
+% \begin{abstract}
+% The \textsf{krbreakurl} package improves line breaking for long URLs and URIs
+% under LuaLaTeX. It permits line breaks after almost every character, protects
+% URI schemes, preserves clickable hyperlinks, and can print a configurable
+% continuation mark when a break occurs.
+% \end{abstract}
+%
+% \section{Requirements}
+%
+% The package is intended for LuaLaTeX and requires \textsf{hyperref}.
+%
+% \section{Basic usage}
+%
+% Load the package:
+%
+% \begin{verbatim}
+% \usepackage{krbreakurl}
+% \end{verbatim}
+%
+% Then use:
+%
+% \begin{verbatim}
+% \breakurl{https://www.example.org/a/very/long/url}
+% \end{verbatim}
+%
+% \section{Configuration}
+%
+% The continuation mark is changed with:
+%
+% \begin{verbatim}
+% \krbreakurlsetup{
+%   continuation={\tiny$\Rightarrow$}
+% }
+% \end{verbatim}
+%
+% To suppress the mark:
+%
+% \begin{verbatim}
+% \krbreakurlsetup{
+%   continuation={}
+% }
+% \end{verbatim}
+%
+% \section{URI schemes}
+%
+% URI schemes are recognized using the RFC-3986 syntax
+%
+% \begin{verbatim}
+% ALPHA *( ALPHA / DIGIT / "+" / "-" / "." ) ":"
+% \end{verbatim}
+%
+% A following |//| is protected as part of the prefix. Thus prefixes such as
+% |https://|, |ftp://|, |mailto:|, |doi:|, and |git+ssh://| remain intact.
+%
+% \section{Design}
+%
+% Each possible break point consists of non-breaking stretchable glue followed
+% by a discretionary. The glue gives TeX a little flexibility, while
+% |\nobreak| ensures that a line break occurs at the discretionary itself so
+% that the continuation mark is printed.
+%
+% \StopEventually{\PrintChanges\PrintIndex}
+%
+% \section{Implementation}
+%
+% \begin{macrocode}
+%<*package>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesExplPackage
+  {krbreakurl}
+  {2026-07-16}
+  {0.03}
+  {Breakable URLs with visible continuation marks}
+
+\RequirePackage{hyperref}
+
+\ExplSyntaxOn
+
+\tl_new:N  \l_krbreakurl_url_tl
+\tl_new:N  \l_krbreakurl_continuation_tl
+\seq_new:N \l_krbreakurl_scheme_match_seq
+
+\int_new:N \l_krbreakurl_url_len_int
+\int_new:N \l_krbreakurl_scheme_len_int
+\int_new:N \l_krbreakurl_position_int
+
+\keys_define:nn
+  { krbreakurl }
+  {
+    continuation .tl_set:N =
+      \l_krbreakurl_continuation_tl,
+
+    continuation .initial:n =
+      {
+        \tiny
+        $\hookrightarrow$
+      }
+  }
+
+\cs_new_protected:Npn \krbreakurl_set_scheme_length:n #1
+  {
+    \int_zero:N \l_krbreakurl_scheme_len_int
+    \seq_clear:N \l_krbreakurl_scheme_match_seq
+
+    \regex_extract_once:nnNT
+      { \A [A-Za-z] [A-Za-z0-9+.-]* : (//)? }
+      { #1 }
+      \l_krbreakurl_scheme_match_seq
+      {
+        \int_set:Nn
+          \l_krbreakurl_scheme_len_int
+          {
+            \tl_count:e
+              {
+                \seq_item:Nn
+                  \l_krbreakurl_scheme_match_seq
+                  { 1 }
+              }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \krbreakurl_insert_breakpoint:
+  {
+    \nobreak
+    \hskip 0pt plus .5pt
+
+    \discretionary
+      {
+        \hbox to 0pt
+          {
+            \tl_use:N \l_krbreakurl_continuation_tl
+            \hss
+          }
+      }
+      { }
+      { }
+  }
+
+\cs_new_protected:Npn \krbreakurl_typeset:n #1
+  {
+    \group_begin:
+      \ttfamily
+
+      \tl_set:Nn \l_krbreakurl_url_tl { #1 }
+
+      \int_set:Nn
+        \l_krbreakurl_url_len_int
+        { \tl_count:N \l_krbreakurl_url_tl }
+
+      \krbreakurl_set_scheme_length:n { #1 }
+
+      \href{#1}
+        {
+          \int_zero:N \l_krbreakurl_position_int
+
+          \tl_map_inline:Nn
+            \l_krbreakurl_url_tl
+            {
+              \int_incr:N \l_krbreakurl_position_int
+
+              ##1
+
+              \int_compare:nNnT
+                { \l_krbreakurl_position_int }
+                >
+                { 1 }
+                {
+                  \int_compare:nT
+                    {
+                      \l_krbreakurl_position_int
+                      >=
+                      \l_krbreakurl_scheme_len_int
+                    }
+                    {
+                      \int_compare:nNnT
+                        { \l_krbreakurl_position_int }
+                        <
+                        { \l_krbreakurl_url_len_int - 1 }
+                        {
+                          \krbreakurl_insert_breakpoint:
+                        }
+                    }
+                }
+            }
+        }
+
+    \group_end:
+  }
+
+\NewDocumentCommand
+  \krbreakurlsetup
+  { m }
+  {
+    \keys_set:nn
+      { krbreakurl }
+      { #1 }
+  }
+
+\NewDocumentCommand
+  \breakurl
+  { v }
+  {
+    \krbreakurl_typeset:n { #1 }
+  }
+
+\ExplSyntaxOff
+
+%</package>
+%    \end{macrocode}
+%
+% \Finale
