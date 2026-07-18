@@ -1,13 +1,8 @@
-% \iffalse meta-comment
-%
-% Copyright (c) 2026 Klaus Rindfrey
-%
-% This file may be distributed and/or modified under the conditions of the
-% MIT License.
-%
+% \iffalse
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{fontspec}
+\AtBeginDocument{\RequirePackage{krbreakurl}}
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
@@ -15,45 +10,69 @@
   \DocInput{krbreakurl.dtx}
 \end{document}
 %</driver>
-%
 % \fi
 %
 % \GetFileInfo{krbreakurl.sty}
 %
-% \title{\textsf{krbreakurl}: breakable URLs with visible continuation marks}
+% \title{\textsf{krbreakurl}: Breakable URLs with visible continuation marks}
 % \author{Klaus Rindfrey}
 % \date{Version \fileversion\ (\filedate)}
 %
 % \maketitle
 %
 % \begin{abstract}
-% The \textsf{krbreakurl} package improves line breaking for long URLs and URIs
-% under LuaLaTeX. It permits line breaks after almost every character, protects
-% URI schemes, preserves clickable hyperlinks, and can print a configurable
-% continuation mark when a break occurs.
+% The \textsf{krbreakurl} package typesets long, clickable URLs and URIs under
+% LuaLaTeX. It permits line breaks after almost every character, keeps URI
+% schemes intact, and can display a configurable continuation mark when a
+% break occurs.
 % \end{abstract}
+%
+% \tableofcontents
+%
+% \section{Introduction}
+%
+% Long URLs are difficult to set in narrow text blocks. The standard
+% \cs{url} command and the \textsf{xurl} package offer useful break points,
+% but they do not display a visible continuation mark.
+%
+% \textsf{krbreakurl} follows a deliberately simple approach:
+%
+% \begin{itemize}
+%   \item insert a possible break after almost every character;
+%   \item keep the URI scheme and a following |//| together;
+%   \item preserve a clickable hyperlink;
+%   \item print a continuation mark only when a break is actually taken;
+%   \item leave normal text hyphenation unchanged.
+% \end{itemize}
 %
 % \section{Requirements}
 %
 % The package is intended for LuaLaTeX and requires \textsf{hyperref}.
 %
-% \section{Basic usage}
+% \section{Installation}
 %
-% Load the package:
+% Run
 %
 % \begin{verbatim}
-% \usepackage{krbreakurl}
+% lualatex krbreakurl.ins
 % \end{verbatim}
 %
-% Then use:
+% to extract |krbreakurl.sty| from this documented source.
+%
+% \section{Public interface}
+%
+% \DescribeMacro{\breakurl}
+% The command
 %
 % \begin{verbatim}
 % \breakurl{https://www.example.org/a/very/long/url}
 % \end{verbatim}
 %
-% \section{Configuration}
+% typesets its argument in a typewriter font as a clickable hyperlink. The
+% argument is read verbatim, so characters such as |_| can be used directly.
 %
-% The continuation mark is changed with:
+% \DescribeMacro{\krbreakurlsetup}
+% Package settings are changed globally with
 %
 % \begin{verbatim}
 % \krbreakurlsetup{
@@ -61,49 +80,93 @@
 % }
 % \end{verbatim}
 %
-% To suppress the mark:
+% The only setting currently provided is |continuation|. Its default value is
+% |\tiny$\hookrightarrow$|. An empty value suppresses the mark.
 %
-% \begin{verbatim}
-% \krbreakurlsetup{
-%   continuation={}
-% }
-% \end{verbatim}
+% \section{Examples}
+%
+% The following narrow minipage deliberately forces several line breaks.
+%
+% \begin{center}
+% \begin{minipage}{0.48\linewidth}
+% \breakurl{https://www.example.org/documentation/releases/2026/07/18/a/very/long/path/with/query/parameters?language=en&format=pdf&download=true}
+% \end{minipage}
+% \end{center}
+%
+% \begingroup
+% \krbreakurlsetup{continuation={\tiny$\Rightarrow$}}
+% \begin{center}
+% \begin{minipage}{0.48\linewidth}
+% \breakurl{git+ssh://git.example.org/repositories/latex/krbreakurl/branches/feature/documentation/index.html}
+% \end{minipage}
+% \end{center}
+% \endgroup
 %
 % \section{URI schemes}
 %
-% URI schemes are recognized using the RFC-3986 syntax
+% A URI scheme is recognized using the RFC~3986 form
 %
 % \begin{verbatim}
 % ALPHA *( ALPHA / DIGIT / "+" / "-" / "." ) ":"
 % \end{verbatim}
 %
-% A following |//| is protected as part of the prefix. Thus prefixes such as
-% |https://|, |ftp://|, |mailto:|, |doi:|, and |git+ssh://| remain intact.
+% If the colon is followed immediately by |//|, the slashes are protected as
+% part of the prefix.
 %
-% \section{Design}
+% \section{Line-breaking algorithm}
 %
-% Each possible break point consists of non-breaking stretchable glue followed
-% by a discretionary. The glue gives TeX a little flexibility, while
-% |\nobreak| ensures that a line break occurs at the discretionary itself so
-% that the continuation mark is printed.
+% After each eligible character, the package inserts non-breaking stretchable
+% glue followed by a discretionary. The stretchable glue gives TeX additional
+% flexibility. The preceding \cs{nobreak} is essential because it forces an
+% actual line break to occur at the discretionary, where the continuation mark
+% is emitted.
+%
+% No break point is inserted after the first character, inside the protected
+% URI prefix, or so late that only the final character would remain on the
+% following line.
+%
+% \section{Building the documentation}
+%
+% A complete manual build is:
+%
+% \begin{verbatim}
+% lualatex krbreakurl.dtx
+% makeindex -s gind.ist -o krbreakurl.ind krbreakurl.idx
+% makeindex -s gglo.ist -o krbreakurl.gls krbreakurl.glo
+% lualatex krbreakurl.dtx
+% lualatex krbreakurl.dtx
+% \end{verbatim}
+%
+% \section{Change history}
+%
+% \changes{v0.01}{2026-07-01}{Initial implementation.}
+% \changes{v0.02}{2026-07-10}{Internal improvements.}
+% \changes{v0.03}{2026-07-18}{General URI scheme detection and configurable
+% continuation mark.}
 %
 % \StopEventually{\PrintChanges\PrintIndex}
 %
 % \section{Implementation}
 %
-% \begin{macrocode}
+% \subsection{Package declaration}
+%
+%    \begin{macrocode}
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesExplPackage
   {krbreakurl}
-  {2026-07-16}
+  {2026-07-18}
   {0.03}
   {Breakable URLs with visible continuation marks}
 
 \RequirePackage{hyperref}
 
 \ExplSyntaxOn
-
+%    \end{macrocode}
+%
+% \subsection{Variables}
+%
+%    \begin{macrocode}
 \tl_new:N  \l_krbreakurl_url_tl
 \tl_new:N  \l_krbreakurl_continuation_tl
 \seq_new:N \l_krbreakurl_scheme_match_seq
@@ -111,7 +174,11 @@
 \int_new:N \l_krbreakurl_url_len_int
 \int_new:N \l_krbreakurl_scheme_len_int
 \int_new:N \l_krbreakurl_position_int
-
+%    \end{macrocode}
+%
+% \subsection{Configuration}
+%
+%    \begin{macrocode}
 \keys_define:nn
   { krbreakurl }
   {
@@ -124,14 +191,19 @@
         $\hookrightarrow$
       }
   }
-
+%    \end{macrocode}
+%
+% \subsection{URI scheme detection}
+%
+% Determine the length of the initial URI scheme, including a following |//|.
+%    \begin{macrocode}
 \cs_new_protected:Npn \krbreakurl_set_scheme_length:n #1
   {
     \int_zero:N \l_krbreakurl_scheme_len_int
     \seq_clear:N \l_krbreakurl_scheme_match_seq
 
     \regex_extract_once:nnNT
-      { \A [A-Za-z] [A-Za-z0-9+.-]* : (//)? }
+      { \A [A-Za-z] [-A-Za-z0-9+.]* : (//)? }
       { #1 }
       \l_krbreakurl_scheme_match_seq
       {
@@ -147,7 +219,11 @@
           }
       }
   }
-
+%    \end{macrocode}
+%
+% \subsection{Insertion of a break point}
+%
+%    \begin{macrocode}
 \cs_new_protected:Npn \krbreakurl_insert_breakpoint:
   {
     \nobreak
@@ -164,7 +240,11 @@
       { }
       { }
   }
-
+%    \end{macrocode}
+%
+% \subsection{Typesetting}
+%
+%    \begin{macrocode}
 \cs_new_protected:Npn \krbreakurl_typeset:n #1
   {
     \group_begin:
@@ -215,7 +295,11 @@
 
     \group_end:
   }
-
+%    \end{macrocode}
+%
+% \subsection{Public commands}
+%
+%    \begin{macrocode}
 \NewDocumentCommand
   \krbreakurlsetup
   { m }
@@ -224,16 +308,19 @@
       { krbreakurl }
       { #1 }
   }
-
+%    \end{macrocode}
+%
+%    \begin{macrocode}
 \NewDocumentCommand
   \breakurl
   { v }
   {
     \krbreakurl_typeset:n { #1 }
   }
-
+%    \end{macrocode}
+%
+%    \begin{macrocode}
 \ExplSyntaxOff
-
 %</package>
 %    \end{macrocode}
 %
