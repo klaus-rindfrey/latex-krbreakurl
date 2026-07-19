@@ -1,55 +1,59 @@
-\documentclass[a5paper,11pt]{article}
+\documentclass{article}
 
-\usepackage{fontspec}
-\usepackage[hidelinks]{hyperref}
+\usepackage[a4paper,margin=2cm]{geometry}
+
 \usepackage{krbreakurl}
-
-% A deliberately narrow text block makes the line-breaking behavior easy
-% to inspect.
-\setlength{\textwidth}{7cm}
 
 \begin{document}
 
-\section*{Default continuation mark}
+\section*{krbreakurl demonstration}
 
-This paragraph provides enough surrounding text to demonstrate how a long URL
-behaves inside normal prose. The following address is deliberately much longer
-than the available line width:
-
-\medskip
-
-\breakurl{https://www.example.org/documentation/releases/2026/07/16/a/very/long/path/with/query/parameters?language=en&format=pdf&download=true#installation-instructions}
+The examples below use a deliberately narrow text width to force line breaks.
 
 \bigskip
 
-\section*{Other URI schemes}
+\begin{minipage}{0.45\linewidth}
 
-The package also protects schemes other than HTTP and HTTPS:
+\subsection*{HTTPS}
 
-\medskip
-
-\breakurl{ftp://ftp.example.org/pub/releases/2026/07/16/packages/krbreakurl/abcdefghijklmnopqrstuvwxyz0123456789.tar.gz}
+\breakurl{https://www.example.org/documentation/releases/2026/07/18/a/very/long/path/with/query/parameters?language=en&format=pdf&download=true}
 
 \bigskip
 
-\breakurl{mailto:someone.with.a.very.long.name+latex-package@example.org?subject=Question-about-krbreakurl&body=This-is-a-long-test-message}
+\subsection*{FTP}
+
+\breakurl{ftp://ftp.example.org/pub/software/tex/latex/contrib/krbreakurl/archive/latest.tar.gz}
 
 \bigskip
 
-\breakurl{doi:10.1000/abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ}
+\subsection*{Git}
+
+\breakurl{git+ssh://git.example.org/repositories/latex/krbreakurl/branches/feature/documentation/index.html}
+
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\linewidth}
+
+\subsection*{mailto}
+
+\breakurl{mailto:very.long.email.address.with.many.parts@example.org}
 
 \bigskip
 
-\section*{Configured continuation mark}
+\subsection*{DOI}
 
-The continuation mark can be changed without modifying the package:
+\breakurl{doi:10.1234/abcdefghijklmnopqrstuvwxyz0123456789}
+
+\bigskip
+
+\subsection*{Custom continuation mark}
 
 \krbreakurlsetup{
-  continuation={\tiny$\Rightarrow$}
+    continuation={\tiny$\Rightarrow$}
 }
 
-\medskip
+\breakurl{https://www.example.org/a/really/really/really/really/really/really/long/url}
 
-\breakurl{git+ssh://git.example.org/repositories/latex/krbreakurl/branches/feature/configurable-continuation-symbol/documentation/index.html}
+\end{minipage}
 
 \end{document}

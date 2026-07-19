@@ -9,13 +9,15 @@ export TEXINPUTS := $(CURDIR)//:$(TEXINPUTS)
 LATEX := lualatex
 LATEXMK := latexmk
 
-.PHONY: default all sty doc demo clean distclean
+.PHONY: default all sty doc demo clean distclean check
 
 ##############################################################################
 
 default: doc
 
-all: sty doc demo
+check: doc demo
+
+all: sty
 
 ##############################################################################
 
@@ -50,16 +52,19 @@ clean:
 	$(LATEXMK) -c -outdir=$(BUILD) test/demo.tex
 
 	rm -f \
-	    krbreakurl.aux \
-	    krbreakurl.glo \
-	    krbreakurl.gls \
-	    krbreakurl.hd \
-	    krbreakurl.idx \
-	    krbreakurl.ilg \
-	    krbreakurl.ind \
-	    krbreakurl.log \
-	    krbreakurl.out \
-	    krbreakurl.toc
+	    krbreakurl.aux         \
+	    krbreakurl.glo         \
+	    krbreakurl.gls         \
+	    krbreakurl.hd          \
+	    krbreakurl.idx         \
+	    krbreakurl.ilg         \
+	    krbreakurl.ind         \
+	    krbreakurl.log         \
+	    krbreakurl.out         \
+	    krbreakurl.toc         \
+      krbreakurl.fls         \
+      krbreakurl.fdb_latexmk
+
 
 ##############################################################################
 
