@@ -3,6 +3,7 @@
 ##############################################################################
 
 BUILD := build
+VERSION := 1.0
 
 export TEXINPUTS := $(CURDIR)//:$(TEXINPUTS)
 
@@ -18,6 +19,32 @@ default: doc
 check: doc demo
 
 all: sty
+
+
+##############################################################################
+
+DIST := krbreakurl-$(VERSION)
+
+.PHONY: dist
+
+dist: check
+	rm -rf $(DIST)
+	mkdir $(DIST)
+
+	cp \
+	    krbreakurl.dtx \
+	    krbreakurl.ins \
+	    README.md \
+	    LICENSE \
+	    CHANGES.md \
+	    Makefile \
+	    $(DIST)
+
+	cp -r test $(DIST)
+
+	zip -r $(DIST).zip $(DIST)
+
+	rm -rf $(DIST)
 
 ##############################################################################
 
