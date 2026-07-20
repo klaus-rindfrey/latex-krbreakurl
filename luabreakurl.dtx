@@ -21,58 +21,95 @@
 % \maketitle
 %
 % \begin{abstract}
-% The \textsf{luabreakurl} package typesets long, clickable URLs and URIs under
-% LuaLaTeX. It permits line breaks after almost every character, keeps URI
-% schemes intact, and can display a configurable continuation mark when a
-% break occurs.
+% The \textsf{luabreakurl} package typesets long, clickable URLs and URIs with
+% flexible line breaking under Lua\LaTeX. It keeps the URI scheme intact and
+% can display a configurable continuation mark whenever a URL is continued on
+% the following line.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Introduction}
 %
-% Long URLs are difficult to set in narrow text blocks. The standard
-% \cs{url} command and the \textsf{xurl} package offer useful break points,
-% but they do not display a visible continuation mark.
+% Long URLs can cause overfull lines, especially in narrow columns, footnotes,
+% bibliographies, and technical documentation. The standard \cs{url} command
+% and packages such as \textsf{xurl} provide useful line-breaking facilities.
 %
-% \textsf{luabreakurl} follows a deliberately simple approach:
+% The particular aim of \textsf{luabreakurl} is to combine very frequent break
+% opportunities with a visible indication that the URL continues on the next
+% line.
+%
+% The package follows a deliberately simple approach:
 %
 % \begin{itemize}
-%   \item insert a possible break after almost every character;
-%   \item keep the URI scheme and a following |//| together;
-%   \item preserve a clickable hyperlink;
-%   \item print a continuation mark only when a break is actually taken;
-%   \item leave normal text hyphenation unchanged.
+%   \item it inserts a possible break after almost every character;
+%   \item it keeps the URI scheme and a following |//| together;
+%   \item it preserves the URL as a clickable hyperlink;
+%   \item it prints a continuation mark only when a break is actually taken;
+%   \item it does not change the hyphenation of ordinary text.
 % \end{itemize}
 %
 % \section{Requirements}
 %
-% The package is intended for LuaLaTeX and requires \textsf{hyperref}.
+% The package is intended for Lua\LaTeX. It loads \textsf{hyperref}, which is
+% used to create the clickable hyperlink.
 %
 % \section{Installation}
 %
-% Run
+% For a local installation, run
 %
 % \begin{verbatim}
 % lualatex luabreakurl.ins
 % \end{verbatim}
 %
-% to extract |luabreakurl.sty| from this documented source.
+% This extracts |luabreakurl.sty| from the documented source. Place the
+% generated file in the same directory as your document or in a directory
+% searched by \TeX.
 %
-% \section{Public interface}
+% Once the package is distributed through \TeX\ Live or MiK\TeX, it can be
+% installed with the package manager of the respective distribution.
 %
-% \DescribeMacro{\breakurl}
-% The command
+% \section{Quick start}
+%
+% Load the package in the document preamble:
+%
+% \begin{verbatim}
+% \usepackage{luabreakurl}
+% \end{verbatim}
+%
+% Then use \cs{breakurl} for a URL or URI:
 %
 % \begin{verbatim}
 % \breakurl{https://www.example.org/a/very/long/url}
 % \end{verbatim}
 %
-% typesets its argument in a typewriter font as a clickable hyperlink. The
-% argument is read verbatim, so characters such as |_| can be used directly.
+% The result is typeset in a typewriter font and remains clickable.
+%
+% \section{User interface}
+%
+% \subsection{\cs{breakurl}}
+%
+% \DescribeMacro{\breakurl}
+% The command
+%
+% \begin{verbatim}
+% \breakurl{<URL or URI>}
+% \end{verbatim}
+%
+% typesets its argument as a clickable hyperlink and inserts line-break
+% opportunities after almost every character.
+%
+% The argument is read verbatim, so characters such as |_| may be used without
+% escaping.
+%
+% The URI scheme is protected. For example, \texttt{https://},
+% \texttt{mailto:}, and \texttt{git+ssh://} are kept together at the beginning
+% of the URI.
+%
+% \subsection{\cs{luabreakurlsetup}}
 %
 % \DescribeMacro{\luabreakurlsetup}
-% Package settings are changed globally with
+% Package settings are changed with
 %
 % \begin{verbatim}
 % \luabreakurlsetup{
@@ -80,21 +117,46 @@
 % }
 % \end{verbatim}
 %
-% The only setting currently provided is |continuation|. Its default value is
-% |\tiny$\hookrightarrow$|. An empty value suppresses the mark.
+% The only setting currently available is |continuation|. Its default value is
+% |\tiny$\hookrightarrow$|. The value is printed only when a line break is
+% actually taken.
+%
+% To disable the continuation mark, use an empty value:
+%
+% \begin{verbatim}
+% \luabreakurlsetup{
+%   continuation={}
+% }
+% \end{verbatim}
+%
+% Settings obey normal \TeX\ grouping. A temporary setting can therefore be
+% limited to a group:
+%
+% \begin{verbatim}
+% \begingroup
+%   \luabreakurlsetup{
+%     continuation={\tiny$\Rightarrow$}
+%   }
+%   \breakurl{https://www.example.org/a/very/long/url}
+% \endgroup
+% \end{verbatim}
 %
 % \section{Examples}
 %
-% The following narrow minipage deliberately forces several line breaks.
+% The following narrow block deliberately forces line breaks:
 %
 % \begin{center}
 % \begin{minipage}{0.48\linewidth}
-% \breakurl{https://www.example.org/documentation/releases/2026/07/18/a/very/long/path/with/query/parameters?language=en&format=pdf&download=true}
+% \breakurl{https://www.example.org/documentation/releases/2026/07/20/a/very/long/path/with/query/parameters?language=en&format=pdf&download=true}
 % \end{minipage}
 % \end{center}
 %
+% A different continuation mark can be selected:
+%
 % \begingroup
-% \luabreakurlsetup{continuation={\tiny$\Rightarrow$}}
+% \luabreakurlsetup{
+%   continuation={\tiny$\Rightarrow$}
+% }
 % \begin{center}
 % \begin{minipage}{0.48\linewidth}
 % \breakurl{git+ssh://git.example.org/repositories/latex/luabreakurl/branches/feature/documentation/index.html}
@@ -102,32 +164,67 @@
 % \end{center}
 % \endgroup
 %
-% \section{URI schemes}
+% Other URI schemes work in the same way:
 %
-% A URI scheme is recognized using the RFC~3986 form
+% \begin{center}
+% \begin{minipage}{0.48\linewidth}
+% \breakurl{mailto:someone.with.a.very.long.name+latex-package@example.org?subject=Question-about-luabreakurl}
+%
+% \medskip
+%
+% \breakurl{doi:10.1000/abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ}
+% \end{minipage}
+% \end{center}
+%
+% \section{URI scheme recognition}
+%
+% A URI scheme is recognized according to the RFC~3986 form
 %
 % \begin{verbatim}
 % ALPHA *( ALPHA / DIGIT / "+" / "-" / "." ) ":"
 % \end{verbatim}
 %
-% If the colon is followed immediately by |//|, the slashes are protected as
-% part of the prefix.
+% If the colon is followed immediately by |//|, the two slashes are protected
+% as part of the prefix. Consequently prefixes such as |https://|, |ftp://|,
+% |file://|, |git+ssh://|, |mailto:|, and |doi:| remain intact.
 %
-% \section{Line-breaking algorithm}
+% \section{Comparison with other packages}
 %
-% After each eligible character, the package inserts non-breaking stretchable
-% glue followed by a discretionary. The stretchable glue gives TeX additional
-% flexibility. The preceding \cs{nobreak} is essential because it forces an
-% actual line break to occur at the discretionary, where the continuation mark
-% is emitted.
+% The standard \cs{url} command and the \textsf{xurl} package are suitable for
+% many documents and provide established URL-breaking behaviour.
 %
-% No break point is inserted after the first character, inside the protected
-% URI prefix, or so late that only the final character would remain on the
-% following line.
+% \textsf{luabreakurl} is intended for the more specific case in which breaks
+% should be permitted after almost every character and a visible continuation
+% mark is desired.
 %
-% \section{Building the documentation}
+% It is therefore not intended as a general replacement for \textsf{xurl}.
 %
-% A complete manual build is:
+% \section{Limitations}
+%
+% \begin{itemize}
+%   \item The package is intended for Lua\LaTeX.
+%   \item \cs{breakurl} is intended for URLs and URIs, not for arbitrary text.
+%   \item The command takes a verbatim argument and therefore cannot be used in
+%         every moving argument.
+%   \item Break opportunities are intentionally very frequent. Applications
+%         requiring conventional URL-breaking rules may prefer \textsf{xurl}.
+% \end{itemize}
+%
+% \section{Building the package and documentation}
+%
+% A complete build of the package documentation is simply:
+%
+% \begin{verbatim}
+% make
+% \end{verbatim}
+%
+% To build the documentation and the demonstration document, run:
+%
+% \begin{verbatim}
+% make check
+% \end{verbatim}
+%
+% Internally, the documentation build performs the following steps:
 %
 % \begin{verbatim}
 % lualatex luabreakurl.dtx
@@ -137,15 +234,28 @@
 % lualatex luabreakurl.dtx
 % \end{verbatim}
 %
+% The resulting |luabreakurl.pdf| serves both as the user manual and as the
+% documented implementation.
+%
+% \section{License}
+%
+% The package is distributed under the MIT License.
+%
 % \section{Change history}
 %
 % \changes{v0.01}{2026-07-01}{Initial implementation.}
 % \changes{v0.02}{2026-07-10}{Internal improvements.}
 % \changes{v0.03}{2026-07-18}{General URI scheme detection and configurable
 % continuation mark.}
-% \changes{v1.00}{2026-07-19}{Improved docu for first release. Internal improvements.}
+% \changes{v1.0}{2026-07-20}{Renamed the package to
+% \textsf{luabreakurl} and prepared the first public release.}
 %
-% \StopEventually{\PrintChanges\PrintIndex}
+% \StopEventually{
+%   \clearpage
+%   \PrintChanges
+%   \clearpage
+%   \PrintIndex
+% }
 %
 % \section{Implementation}
 %

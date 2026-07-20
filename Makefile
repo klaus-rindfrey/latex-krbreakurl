@@ -23,17 +23,20 @@ all: sty
 
 ##############################################################################
 
-DIST := luabreakurl-$(VERSION)
+DIST := luabreakurl
 
 .PHONY: dist
 
 dist: check
 	rm -rf $(DIST)
+	rm -f $(DIST).zip
+
 	mkdir $(DIST)
 
 	cp \
 	    luabreakurl.dtx \
 	    luabreakurl.ins \
+      luabreakurl.pdf \
 	    README.md \
 	    LICENSE \
 	    CHANGES.md \
@@ -41,7 +44,6 @@ dist: check
 	    $(DIST)
 
 	cp -r test $(DIST)
-
 	zip -r $(DIST).zip $(DIST)
 
 	rm -rf $(DIST)
@@ -56,7 +58,6 @@ luabreakurl.sty: luabreakurl.ins luabreakurl.dtx
 ##############################################################################
 
 doc: sty
-#latexmk -lualatex luabreakurl.dtx
 	$(LATEX) luabreakurl.dtx
 	makeindex -s gind.ist -o luabreakurl.ind luabreakurl.idx
 	makeindex -s gglo.ist -o luabreakurl.gls luabreakurl.glo
