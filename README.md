@@ -1,10 +1,10 @@
-# krbreakurl
+# luabreakurl
 
 **Breakable URLs with configurable continuation marks for LuaLaTeX**
 
-`krbreakurl` is a small LuaLaTeX package for typesetting long URLs and URIs.
+`luabreakurl` is a small LuaLaTeX package for typesetting long URLs and URIs.
 
-Unlike the standard `\url` command and the `xurl` package, `krbreakurl` can display a configurable continuation mark whenever a URL is actually broken across lines.
+Unlike the standard `\url` command and the `xurl` package, `luabreakurl` can display a configurable continuation mark whenever a URL is actually broken across lines.
 
 ## Features
 
@@ -26,7 +26,7 @@ Unlike the standard `\url` command and the `xurl` package, `krbreakurl` can disp
 The continuation mark can be changed globally:
 
 ```latex
-\krbreakurlsetup{
+\luabreakurlsetup{
   continuation={\tiny$\Rightarrow$}
 }
 ```
@@ -34,7 +34,7 @@ The continuation mark can be changed globally:
 or disabled completely:
 
 ```latex
-\krbreakurlsetup{
+\luabreakurlsetup{
   continuation={}
 }
 ```
@@ -43,7 +43,7 @@ or disabled completely:
 
 The standard packages `url` and `xurl` provide many useful break points but intentionally do not indicate where a URL continues on the next line.
 
-`krbreakurl` has a different goal:
+`luabreakurl` has a different goal:
 
 - permit breaks after almost every character,
 - visibly mark continuation across line breaks.
@@ -56,13 +56,13 @@ The standard packages `url` and `xurl` provide many useful break points but inte
 ## Installation
 
 ```
-lualatex krbreakurl.ins
+lualatex luabreakurl.ins
 ```
 
 This generates
 
 ```
-krbreakurl.sty
+luabreakurl.sty
 ```
 
 Compile the documentation with
@@ -74,11 +74,11 @@ make
 or manually
 
 ```
-lualatex krbreakurl.dtx
-makeindex -s gind.ist -o krbreakurl.ind krbreakurl.idx
-makeindex -s gglo.ist -o krbreakurl.gls krbreakurl.glo
-lualatex krbreakurl.dtx
-lualatex krbreakurl.dtx
+lualatex luabreakurl.dtx
+makeindex -s gind.ist -o luabreakurl.ind luabreakurl.idx
+makeindex -s gglo.ist -o luabreakurl.gls luabreakurl.glo
+lualatex luabreakurl.dtx
+lualatex luabreakurl.dtx
 ```
 
 ## License

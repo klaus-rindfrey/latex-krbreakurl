@@ -2,11 +2,11 @@
 
 \usepackage[a4paper,margin=2cm]{geometry}
 
-\usepackage{krbreakurl}
+\usepackage{luabreakurl}
 
 \begin{document}
 
-\section*{krbreakurl demonstration}
+\section*{luabreakurl demonstration}
 
 The examples below use a deliberately narrow text width to force line breaks.
 
@@ -22,13 +22,13 @@ The examples below use a deliberately narrow text width to force line breaks.
 
 \subsection*{FTP}
 
-\breakurl{ftp://ftp.example.org/pub/software/tex/latex/contrib/krbreakurl/archive/latest.tar.gz}
+\breakurl{ftp://ftp.example.org/pub/software/tex/latex/contrib/luabreakurl/archive/latest.tar.gz}
 
 \bigskip
 
 \subsection*{Git}
 
-\breakurl{git+ssh://git.example.org/repositories/latex/krbreakurl/branches/feature/documentation/index.html}
+\breakurl{git+ssh://git.example.org/repositories/latex/luabreakurl/branches/feature/documentation/index.html}
 
 \end{minipage}
 \hfill
@@ -48,7 +48,7 @@ The examples below use a deliberately narrow text width to force line breaks.
 
 \subsection*{Custom continuation mark}
 
-\krbreakurlsetup{
+\luabreakurlsetup{
     continuation={\tiny$\Rightarrow$}
 }
 

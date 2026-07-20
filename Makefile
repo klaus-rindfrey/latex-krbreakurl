@@ -1,5 +1,5 @@
 ##############################################################################
-# krbreakurl
+# luabreakurl
 ##############################################################################
 
 BUILD := build
@@ -23,7 +23,7 @@ all: sty
 
 ##############################################################################
 
-DIST := krbreakurl-$(VERSION)
+DIST := luabreakurl-$(VERSION)
 
 .PHONY: dist
 
@@ -32,8 +32,8 @@ dist: check
 	mkdir $(DIST)
 
 	cp \
-	    krbreakurl.dtx \
-	    krbreakurl.ins \
+	    luabreakurl.dtx \
+	    luabreakurl.ins \
 	    README.md \
 	    LICENSE \
 	    CHANGES.md \
@@ -48,20 +48,20 @@ dist: check
 
 ##############################################################################
 
-sty: krbreakurl.sty
+sty: luabreakurl.sty
 
-krbreakurl.sty: krbreakurl.ins krbreakurl.dtx
-	$(LATEX) krbreakurl.ins
+luabreakurl.sty: luabreakurl.ins luabreakurl.dtx
+	$(LATEX) luabreakurl.ins
 
 ##############################################################################
 
 doc: sty
-#latexmk -lualatex krbreakurl.dtx
-	$(LATEX) krbreakurl.dtx
-	makeindex -s gind.ist -o krbreakurl.ind krbreakurl.idx
-	makeindex -s gglo.ist -o krbreakurl.gls krbreakurl.glo
-	$(LATEX) krbreakurl.dtx
-	$(LATEX) krbreakurl.dtx
+#latexmk -lualatex luabreakurl.dtx
+	$(LATEX) luabreakurl.dtx
+	makeindex -s gind.ist -o luabreakurl.ind luabreakurl.idx
+	makeindex -s gglo.ist -o luabreakurl.gls luabreakurl.glo
+	$(LATEX) luabreakurl.dtx
+	$(LATEX) luabreakurl.dtx
 
 ##############################################################################
 
@@ -79,18 +79,18 @@ clean:
 	$(LATEXMK) -c -outdir=$(BUILD) test/demo.tex
 
 	rm -f \
-	    krbreakurl.aux         \
-	    krbreakurl.glo         \
-	    krbreakurl.gls         \
-	    krbreakurl.hd          \
-	    krbreakurl.idx         \
-	    krbreakurl.ilg         \
-	    krbreakurl.ind         \
-	    krbreakurl.log         \
-	    krbreakurl.out         \
-	    krbreakurl.toc         \
-      krbreakurl.fls         \
-      krbreakurl.fdb_latexmk
+	    luabreakurl.aux         \
+	    luabreakurl.glo         \
+	    luabreakurl.gls         \
+	    luabreakurl.hd          \
+	    luabreakurl.idx         \
+	    luabreakurl.ilg         \
+	    luabreakurl.ind         \
+	    luabreakurl.log         \
+	    luabreakurl.out         \
+	    luabreakurl.toc         \
+      luabreakurl.fls         \
+      luabreakurl.fdb_latexmk
 
 
 ##############################################################################
@@ -99,5 +99,5 @@ distclean: clean
 	rm -rf $(BUILD)
 
 	rm -f \
-	    krbreakurl.pdf \
-	    krbreakurl.sty
+	    luabreakurl.pdf \
+	    luabreakurl.sty

@@ -2,26 +2,26 @@
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{fontspec}
-\AtBeginDocument{\RequirePackage{krbreakurl}}
+\AtBeginDocument{\RequirePackage{luabreakurl}}
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
 \begin{document}
-  \DocInput{krbreakurl.dtx}
+  \DocInput{luabreakurl.dtx}
 \end{document}
 %</driver>
 % \fi
 %
-% \GetFileInfo{krbreakurl.sty}
+% \GetFileInfo{luabreakurl.sty}
 %
-% \title{\textsf{krbreakurl}: Breakable URLs with visible continuation marks}
+% \title{\textsf{luabreakurl}: Breakable URLs with visible continuation marks}
 % \author{Klaus Rindfrey}
 % \date{Version \fileversion\ (\filedate)}
 %
 % \maketitle
 %
 % \begin{abstract}
-% The \textsf{krbreakurl} package typesets long, clickable URLs and URIs under
+% The \textsf{luabreakurl} package typesets long, clickable URLs and URIs under
 % LuaLaTeX. It permits line breaks after almost every character, keeps URI
 % schemes intact, and can display a configurable continuation mark when a
 % break occurs.
@@ -35,7 +35,7 @@
 % \cs{url} command and the \textsf{xurl} package offer useful break points,
 % but they do not display a visible continuation mark.
 %
-% \textsf{krbreakurl} follows a deliberately simple approach:
+% \textsf{luabreakurl} follows a deliberately simple approach:
 %
 % \begin{itemize}
 %   \item insert a possible break after almost every character;
@@ -54,10 +54,10 @@
 % Run
 %
 % \begin{verbatim}
-% lualatex krbreakurl.ins
+% lualatex luabreakurl.ins
 % \end{verbatim}
 %
-% to extract |krbreakurl.sty| from this documented source.
+% to extract |luabreakurl.sty| from this documented source.
 %
 % \section{Public interface}
 %
@@ -71,11 +71,11 @@
 % typesets its argument in a typewriter font as a clickable hyperlink. The
 % argument is read verbatim, so characters such as |_| can be used directly.
 %
-% \DescribeMacro{\krbreakurlsetup}
+% \DescribeMacro{\luabreakurlsetup}
 % Package settings are changed globally with
 %
 % \begin{verbatim}
-% \krbreakurlsetup{
+% \luabreakurlsetup{
 %   continuation={\tiny$\Rightarrow$}
 % }
 % \end{verbatim}
@@ -94,10 +94,10 @@
 % \end{center}
 %
 % \begingroup
-% \krbreakurlsetup{continuation={\tiny$\Rightarrow$}}
+% \luabreakurlsetup{continuation={\tiny$\Rightarrow$}}
 % \begin{center}
 % \begin{minipage}{0.48\linewidth}
-% \breakurl{git+ssh://git.example.org/repositories/latex/krbreakurl/branches/feature/documentation/index.html}
+% \breakurl{git+ssh://git.example.org/repositories/latex/luabreakurl/branches/feature/documentation/index.html}
 % \end{minipage}
 % \end{center}
 % \endgroup
@@ -130,11 +130,11 @@
 % A complete manual build is:
 %
 % \begin{verbatim}
-% lualatex krbreakurl.dtx
-% makeindex -s gind.ist -o krbreakurl.ind krbreakurl.idx
-% makeindex -s gglo.ist -o krbreakurl.gls krbreakurl.glo
-% lualatex krbreakurl.dtx
-% lualatex krbreakurl.dtx
+% lualatex luabreakurl.dtx
+% makeindex -s gind.ist -o luabreakurl.ind luabreakurl.idx
+% makeindex -s gglo.ist -o luabreakurl.gls luabreakurl.glo
+% lualatex luabreakurl.dtx
+% lualatex luabreakurl.dtx
 % \end{verbatim}
 %
 % \section{Change history}
@@ -155,7 +155,7 @@
 %<*package>
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesExplPackage
-  {krbreakurl}
+  {luabreakurl}
   {2026-07-19}
   {1.00}
   {Breakable URLs with visible continuation marks}
@@ -168,23 +168,23 @@
 % \subsection{Variables}
 %
 %    \begin{macrocode}
-\tl_new:N  \l_krbreakurl_url_tl
-\tl_new:N  \l_krbreakurl_continuation_tl
-\seq_new:N \l_krbreakurl_scheme_match_seq
+\tl_new:N  \l_luabreakurl_url_tl
+\tl_new:N  \l_luabreakurl_continuation_tl
+\seq_new:N \l_luabreakurl_scheme_match_seq
 
-\int_new:N \l_krbreakurl_url_len_int
-\int_new:N \l_krbreakurl_scheme_len_int
-\int_new:N \l_krbreakurl_position_int
+\int_new:N \l_luabreakurl_url_len_int
+\int_new:N \l_luabreakurl_scheme_len_int
+\int_new:N \l_luabreakurl_position_int
 %    \end{macrocode}
 %
 % \subsection{Configuration}
 %
 %    \begin{macrocode}
 \keys_define:nn
-  { krbreakurl }
+  { luabreakurl }
   {
     continuation .tl_set:N =
-      \l_krbreakurl_continuation_tl,
+      \l_luabreakurl_continuation_tl,
 
     continuation .initial:n =
       {
@@ -198,23 +198,23 @@
 %
 % Determine the length of the initial URI scheme, including a following |//|.
 %    \begin{macrocode}
-\cs_new_protected:Npn \krbreakurl_set_scheme_length:n #1
+\cs_new_protected:Npn \luabreakurl_set_scheme_length:n #1
   {
-    \int_zero:N \l_krbreakurl_scheme_len_int
-    \seq_clear:N \l_krbreakurl_scheme_match_seq
+    \int_zero:N \l_luabreakurl_scheme_len_int
+    \seq_clear:N \l_luabreakurl_scheme_match_seq
 
     \regex_extract_once:nnNT
       { \A [A-Za-z] [-A-Za-z0-9+.]* : (//)? }
       { #1 }
-      \l_krbreakurl_scheme_match_seq
+      \l_luabreakurl_scheme_match_seq
       {
         \int_set:Nn
-          \l_krbreakurl_scheme_len_int
+          \l_luabreakurl_scheme_len_int
           {
             \tl_count:e
               {
                 \seq_item:Nn
-                  \l_krbreakurl_scheme_match_seq
+                  \l_luabreakurl_scheme_match_seq
                   { 1 }
               }
           }
@@ -225,7 +225,7 @@
 % \subsection{Insertion of a break point}
 %
 %    \begin{macrocode}
-\cs_new_protected:Npn \krbreakurl_insert_breakpoint:
+\cs_new_protected:Npn \luabreakurl_insert_breakpoint:
   {
     \nobreak
     \hskip 0pt plus .5pt
@@ -234,7 +234,7 @@
       {
         \hbox to 0pt
           {
-            \tl_use:N \l_krbreakurl_continuation_tl
+            \tl_use:N \l_luabreakurl_continuation_tl
             \hss
           }
       }
@@ -246,48 +246,48 @@
 % \subsection{Typesetting}
 %
 %    \begin{macrocode}
-\cs_new_protected:Npn \krbreakurl_typeset:n #1
+\cs_new_protected:Npn \luabreakurl_typeset:n #1
   {
     \group_begin:
       \ttfamily
 
-      \tl_set:Nn \l_krbreakurl_url_tl { #1 }
+      \tl_set:Nn \l_luabreakurl_url_tl { #1 }
 
       \int_set:Nn
-        \l_krbreakurl_url_len_int
-        { \tl_count:N \l_krbreakurl_url_tl }
+        \l_luabreakurl_url_len_int
+        { \tl_count:N \l_luabreakurl_url_tl }
 
-      \krbreakurl_set_scheme_length:n { #1 }
+      \luabreakurl_set_scheme_length:n { #1 }
 
       \href{#1}
         {
-          \int_zero:N \l_krbreakurl_position_int
+          \int_zero:N \l_luabreakurl_position_int
 
           \tl_map_inline:Nn
-            \l_krbreakurl_url_tl
+            \l_luabreakurl_url_tl
             {
-              \int_incr:N \l_krbreakurl_position_int
+              \int_incr:N \l_luabreakurl_position_int
 
               ##1
 
               \int_compare:nNnT
-                { \l_krbreakurl_position_int }
+                { \l_luabreakurl_position_int }
                 >
                 { 1 }
                 {
                   \int_compare:nT
                     {
-                      \l_krbreakurl_position_int
+                      \l_luabreakurl_position_int
                       >=
-                      \l_krbreakurl_scheme_len_int
+                      \l_luabreakurl_scheme_len_int
                     }
                     {
                       \int_compare:nNnT
-                        { \l_krbreakurl_position_int }
+                        { \l_luabreakurl_position_int }
                         <
-                        { \l_krbreakurl_url_len_int - 1 }
+                        { \l_luabreakurl_url_len_int - 1 }
                         {
-                          \krbreakurl_insert_breakpoint:
+                          \luabreakurl_insert_breakpoint:
                         }
                     }
                 }
@@ -302,11 +302,11 @@
 %
 %    \begin{macrocode}
 \NewDocumentCommand
-  \krbreakurlsetup
+  \luabreakurlsetup
   { m }
   {
     \keys_set:nn
-      { krbreakurl }
+      { luabreakurl }
       { #1 }
   }
 %    \end{macrocode}
@@ -316,7 +316,7 @@
   \breakurl
   { v }
   {
-    \krbreakurl_typeset:n { #1 }
+    \luabreakurl_typeset:n { #1 }
   }
 %    \end{macrocode}
 %
